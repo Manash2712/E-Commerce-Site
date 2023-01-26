@@ -39,7 +39,7 @@ const userSchema = mongoose.Schema(
 
 // encrypt pw before saving it into DB
 userSchema.pre("save", async function (next) {
-    if (!this.modified("password")) return next();
+    if (!this.isModified("password")) return next();
     this.password = await bcrypt.hash(this.password, 10);
     next();
 });
@@ -52,7 +52,7 @@ userSchema.methods = {
         return await bcrypt.compare(enteredPassword, this.password);
     },
     // generate JWT TOKEN
-    getJwtTsoken: function(){
+    getJwtToken: function(){
         return JWT.sign(
             {
                 _id: this._id,
@@ -64,6 +64,21 @@ userSchema.methods = {
                 expiresIn: config.JWT_EXPIRY
             }
         )
+    },
+
+    generateForgotPasswordToken: function(){
+        const forgotToken = crypto.randomBytes(20).toString('hex');
+
+        // step1 save to DB
+        this.forgotPasswordToken = crypto
+        .createHash("sha256")
+        .update(forgotToken)
+        .digest("hex")
+
+        this.forgotPasswordExpiry = Date.now() + 20*60*1000;//20minutes
+        // step2 return values to 
+        
+        return forgotToken
     }
 };
 
