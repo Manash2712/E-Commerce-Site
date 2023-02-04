@@ -233,7 +233,7 @@ export const resetPassword = asyncHandler(async(req,res)=> {
 
 ****************************/
 
-export const getProfile = asyncHandler(async(req,_res, next)=> {
+export const getProfile = asyncHandler(async(req,_res)=> {
     const {user} = req
     if(!user){
         throw new CustomError('User not found', 404)
